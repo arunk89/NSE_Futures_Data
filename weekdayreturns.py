@@ -10,6 +10,8 @@ It assumes we buy 1 stock or 1 Index on close of the day everyday.
 We fetch data from 1/1/2000 using nsepy. Am not sure whether the stock data we
 receive is adjusted for splits and bonuses.
 
+You can check the graph created here - https://imgur.com/a/MVjKtae
+
 @author: arkamath
 """
 # Import section
