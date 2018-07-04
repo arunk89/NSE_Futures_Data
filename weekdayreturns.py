@@ -10,15 +10,13 @@ It assumes we buy 1 stock or 1 Index on close of the day everyday.
 We fetch data from 1/1/2000 using nsepy. Am not sure whether the stock data we
 receive is adjusted for splits and bonuses.
 
-You can check the graph created here - https://imgur.com/a/MVjKtae
-
 @author: arkamath
 """
 # Import section
 import pandas as pd
-from datetime import date
+from datetime import date, timedelta
 from nsepy import get_history
-import sys
+#import sys
 import matplotlib.pyplot as plt
  
 def draw_graph(df_returns):
@@ -85,8 +83,8 @@ def calculate_returns(df_returns,symbol):
     df_aggregate['Profit Today'] = (df_aggregate['Units Purchased'] * \
     current_value) - df_aggregate['Total Investment']
     
-    df_aggregate['Profit %'] = ((df_aggregate['Profit Today'] - \
-    df_aggregate['Total Investment'])/ df_aggregate['Total Investment'] )*100
+    df_aggregate['Profit %'] = ((df_aggregate['Profit Today'] )\
+    / df_aggregate['Total Investment'] )*100
     
     df_aggregate['Cost per Unit'] = df_aggregate['Total Investment']/ \
     df_aggregate['Units Purchased']    
@@ -112,7 +110,7 @@ def get_data(symbol):
     
     historic_data = get_history(symbol=symbol,
                             start=date(2000,1,1),
-                            end=date(2018,6,29),
+                            end=date.today(),
                             index=index_bool)
     
     if historic_data.empty:
@@ -137,11 +135,12 @@ def get_data(symbol):
     return df_data
     
 def main():
-    if len(sys.argv) < 2:
-        print ("execute in cmd like 'python weedayreturns.py NIFTY'")
-        exit(1)    
-    symbol = sys.argv[1]    
+#    if len(sys.argv) < 2:
+#        print ("execute in cmd like 'python weedayreturns.py NIFTY'")
+#        exit(1)    
+#    symbol = sys.argv[1]    
 #    symbol = 'NIFTY'
+    symbol = input('Enter the SYMBOL in NSE format  ')
     df_returns = pd.DataFrame()
         
     df_returns = calculate_returns(df_returns,symbol)
