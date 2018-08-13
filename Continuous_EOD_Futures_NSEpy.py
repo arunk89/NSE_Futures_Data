@@ -22,7 +22,7 @@ def fetch_data(contract, expiry, start_date):
                         futures=True,
                         expiry_date=expiry)
     
-    df_futures = curr_fut_data[:-1].copy() 
+    df_futures = curr_fut_data[:].copy() 
     
     df_futures.reset_index(drop=False, inplace=True)
     df_futures['Date']= pd.to_datetime(df_futures['Date'])
