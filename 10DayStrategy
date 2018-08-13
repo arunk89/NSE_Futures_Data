@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+"""
+Copy the SYMBOLS in this link in a text file as a list
+www.nseindia.com/products/content/derivatives/equities/fo_underlying_home.htm
+Name the text file "fut_list.txt". Only add NIFTY and BANKNIFTY from the Index
+section as others don't have much activity and may cause the program to give
+an error
+@author: arkamath
+"""
+# Import section
+import pandas as pd
+from datetime import date, timedelta
+from nsepy import get_history
+from nsepy.derivatives import get_expiry_date
+
+def calculator(futures_data):
+    futures_data = futures_data.iloc[-10:]
+    futures_data["HMO"] = futures_data["High"] - futures_data["Open"]
+    futures_data["OML"] = futures_data["Open"] - futures_data["Low"]
+    futures_data["MIN"] = futures_data[["HMO","OML"]].min(axis=1)
+    futures_data.reset_index(drop=False, inplace=True)
+    calc_data = pd.DataFrame(index=[0],columns=["Date","Symbol","Avg"])
+    calc_data.at[calc_data.index[0],"Date"] = futures_data.iloc[9]["Date"]
+    calc_data.at[calc_data.index[0],"Symbol"] = futures_data.iloc[9]["Symbol"]
+    calc_data.at[calc_data.index[0],"Avg"] = futures_data["MIN"].mean()
+    return calc_data
+
+def fut_data(fut,then_d,expiry_c,index_bool):
+    df_futures = pd.DataFrame()
+    curr_fut_data = get_history(symbol=fut,
+                        start=then_d,
+                        end=expiry_c,
+                        index=index_bool,
+                        futures=True,
+                        expiry_date=expiry_c)
+    df_futures = curr_fut_data[:].copy() 
+    
+    df_futures.reset_index(drop=False, inplace=True)
+    df_futures['Date']= pd.to_datetime(df_futures['Date'])
+    df_futures.set_index('Date', inplace=True)
+    
+    return df_futures
+    
+def fetch_data(fut):
+    df_combined = pd.DataFrame()
+    now_d = date.today()
+    then_d = now_d - timedelta(days=20)
+    
+    year_c = now_d.year
+    month_c = now_d.month
+    
+    year_p = then_d.year
+    month_p = then_d.month
+    
+    expiry_c = get_expiry_date(year=year_c, month=month_c)
+    expiry_p = get_expiry_date(year=year_p, month=month_p)
+      
+    fut = fut.strip()
+    #add OR cond. for additional index    
+    if fut == "NIFTY" or fut == "BANKNIFTY":
+        index_bool = True
+    else:
+        index_bool = False
+    
+    if expiry_c == expiry_p:
+        df_combined = fut_data(fut,then_d,expiry_c,index_bool)
+    else:
+
+        df_combined = fut_data(fut,then_d,expiry_p,index_bool)
+        df_combined = df_combined.append(fut_data(fut,expiry_p+timedelta(days=1),
+                               expiry_c,index_bool))
+    
+    return df_combined
+        
+  
+
+def main():
+    filename = '10daystrategy.xlsx'
+    writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+    fut_list = open(r'fut_list.txt','r')
+    calc_data = pd.DataFrame()
+    
+    for fut in fut_list.readlines():
+        print(fut)
+        futures_data = fetch_data(fut.upper())
+        calc_data = calc_data.append(calculator(futures_data))
+        
+    calc_data.set_index('Date', inplace=True)    
+    calc_data.to_excel(writer)
+    writer.save() 
+
+
+if __name__ == '__main__':
+
+    main()    
