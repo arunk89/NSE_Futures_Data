@@ -19,10 +19,12 @@ def calculator(futures_data):
     futures_data["OML"] = futures_data["Open"] - futures_data["Low"]
     futures_data["MIN"] = futures_data[["HMO","OML"]].min(axis=1)
     futures_data.reset_index(drop=False, inplace=True)
-    calc_data = pd.DataFrame(index=[0],columns=["Date","Symbol","Avg"])
+    calc_data = pd.DataFrame(index=[0],columns=["Date","Symbol","Avg","Volt"])
     calc_data.at[calc_data.index[0],"Date"] = futures_data.iloc[9]["Date"]
     calc_data.at[calc_data.index[0],"Symbol"] = futures_data.iloc[9]["Symbol"]
     calc_data.at[calc_data.index[0],"Avg"] = futures_data["MIN"].mean()
+    calc_data.at[calc_data.index[0],"Volt"] = (futures_data["MIN"].mean()/
+                                        futures_data["Close"].mean())*100
     return calc_data
 
 def fut_data(fut,then_d,expiry_c,index_bool):
