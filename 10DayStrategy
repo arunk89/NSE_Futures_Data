@@ -64,7 +64,7 @@ def fetch_data(fut):
     else:
         index_bool = False
     
-    if expiry_c == expiry_p:
+    if expiry_c == expiry_p or then_d > expiry_p:
         df_combined = fut_data(fut,then_d,expiry_c,index_bool)
     else:
 
