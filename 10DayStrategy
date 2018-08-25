@@ -18,7 +18,7 @@ def calculator(futures_data):
     futures_data = futures_data.iloc[-10:]
     futures_data["HMO"] = futures_data["High"] - futures_data["Open"]
     futures_data["OML"] = futures_data["Open"] - futures_data["Low"]
-    futures_data["MIN"] = futures_data[["HMO","OML"]].max(axis=1)
+    futures_data["MIN"] = futures_data[["HMO","OML"]].min(axis=1)
     futures_data["MAX"] = futures_data[["HMO","OML"]].max(axis=1)
     futures_data.reset_index(drop=False, inplace=True)
     calc_data = pd.DataFrame(index=[0],columns=["Date","Symbol","MinAvg","MinVolt","MaxAvg","MaxVolt"])
