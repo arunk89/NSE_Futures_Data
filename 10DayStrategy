@@ -116,9 +116,6 @@ def main():
 
     filename = "10daystrategy.xlsx"
 
-    if os.path.exists(filename):
-        os.remove(filename)
-
     fut_list = open(r"fut_list.txt", "r")
     calc_data = pd.DataFrame()
 
@@ -127,6 +124,9 @@ def main():
         sleep(5)
         futures_data = fetch_data(fut.upper())
         calc_data = calc_data.append(calculator(futures_data))
+
+    if os.path.exists(filename):
+        os.remove(filename)
 
     writer = pd.ExcelWriter(filename, engine="xlsxwriter")
     calc_data.set_index("Date", inplace=True)
