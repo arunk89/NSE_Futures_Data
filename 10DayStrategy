@@ -107,31 +107,43 @@ def fetch_data(fut):
 
 def main():
 
-    filename = "10daystrategy.xlsx"
-    # csv_name = "10daystrategy.csv"
+    stk_no = 0
+    # filename = "10daystrategy.xlsx"
+    filename = "10daystrategy.csv"
 
     fut_list = open(r"fut_list.txt", "r")
     calc_data = pd.DataFrame()
+    if os.path.exists(filename):
+        os.remove(filename)
 
     for fut in fut_list.readlines():
-        print(fut)
-        sleep(3)
+        stk_no += 1
+        print(stk_no, " ", fut)
         futures_data = fetch_data(fut.upper())
         calc_data = calc_data.append(calculator(futures_data))
+        if stk_no % 20 == 0 or stk_no == 208:
+            sleep(20)
+            if stk_no == 20:
+                writemode='w'
+                header=True
+            else:
+                writemode='a'
+                header=False
 
-
-    if os.path.exists(filename):
-             os.remove(filename)
+            with open(filename, writemode) as f:
+                 calc_data.to_csv(f, header=header,index=False)
+            f.close()
+            calc_data = calc_data.iloc[0:0]
 
     # calc_data.to_csv(path_or_buf=csv_name)
 
-    writer = pd.ExcelWriter(filename, engine="xlsxwriter")
-    calc_data.set_index("Date", inplace=True)
-    calc_data.to_excel(writer)
-    writer.save()
+    # writer = pd.ExcelWriter(filename, engine="xlsxwriter")
+    # calc_data.set_index("Date", inplace=True)
+    # calc_data.to_excel(writer)
+    # writer.save()
 
     Popen(
-        r"C:\Program Files (x86)\Microsoft Office\Office15\excel.exe 10daystrategy.xlsx"
+        r"C:\Program Files (x86)\Microsoft Office\Office15\excel.exe 10daystrategy.csv"
     )
 
 
